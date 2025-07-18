@@ -1,50 +1,135 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>✏️ Resuelve los ejercicios</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>📚 Ejercicios de Tablas de Multiplicar</title>
+  <style>
+    body {
+      background: linear-gradient(to right, #89f7fe, #66a6ff);
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      color: #fff;
+      padding: 2em;
+      text-align: center;
+    }
+    h1 {
+      font-size: 3em;
+      margin-bottom: 0.5em;
+    }
+    .ejercicio {
+      margin: 1em 0;
+      font-size: 1.8em;
+    }
+    input[type="number"] {
+      font-size: 1.5em;
+      padding: 0.3em 0.5em;
+      border-radius: 10px;
+      border: none;
+      width: 100px;
+      text-align: center;
+      margin-left: 10px;
+    }
+    button {
+      font-size: 1.5em;
+      margin-top: 1.5em;
+      padding: 0.5em 1em;
+      border-radius: 12px;
+      border: none;
+      background-color: #fff;
+      color: #007BFF;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    button:hover {
+      background-color: #e0f0ff;
+    }
+    #pagina {
+      margin-top: 2em;
+      font-size: 1.3em;
+    }
+  </style>
 </head>
 <body>
-  <h1>✏️ Resuelve los ejercicios</h1>
-  <div id="contenedorEjercicios" class="card"></div>
-  <button onclick="siguiente()">➡️ Siguiente</button>
+  <h1>📚 Practica tus Tablas de Multiplicar</h1>
+  <form id="formEjercicios">
+    <div id="ejerciciosContainer"></div>
+    <button type="submit">Enviar respuestas</button>
+  </form>
+  <div id="pagina"></div>
+
+  <audio id="audioCorrecto" src="sonidos/correcto.mp3"></audio>
+  <audio id="audioIncorrecto" src="sonidos/incorrecto.mp3"></audio>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const page = parseInt(urlParams.get("page") || "1");
-    const ejercicios = JSON.parse(localStorage.getItem("ejercicios"));
-    const respuestas = JSON.parse(localStorage.getItem("respuestas")) || [];
+    const inicio = parseInt(localStorage.getItem("inicio")) || 1;
+    const fin = parseInt(localStorage.getItem("fin")) || 3;
+    const totalEjercicios = 50;
+    const ejerciciosPorPagina = 25;
 
-    const inicio = (page - 1) * 25;
-    const fin = inicio + 25;
-    const subset = ejercicios.slice(inicio, fin);
+    let ejercicios = [];
+    let paginaActual = parseInt(localStorage.getItem("paginaActual")) || 1;
 
-    const contenedor = document.getElementById("contenedorEjercicios");
-    subset.forEach((ej, i) => {
-      const div = document.createElement("div");
-      div.innerHTML = `
-        ${ej.a} × ${ej.b} = 
-        <input type="number" data-index="${inicio + i}" />
-      `;
-      contenedor.appendChild(div);
-    });
+    function generarEjercicios() {
+      ejercicios = [];
+      for (let i = 0; i < totalEjercicios; i++) {
+        let a = Math.floor(Math.random() * (fin - inicio + 1)) + inicio;
+        let b = Math.floor(Math.random() * 10) + 1;
+        ejercicios.push({ a, b });
+      }
+      localStorage.setItem("ejercicios", JSON.stringify(ejercicios));
+    }
 
-    function siguiente() {
-      const inputs = document.querySelectorAll("input");
-      inputs.forEach(input => {
-        const idx = parseInt(input.dataset.index);
-        respuestas[idx] = parseInt(input.value || "-1");
+    function mostrarEjercicios() {
+      if (!localStorage.getItem("ejercicios")) {
+        generarEjercicios();
+      } else {
+        ejercicios = JSON.parse(localStorage.getItem("ejercicios"));
+      }
+
+      const start = (paginaActual - 1) * ejerciciosPorPagina;
+      const end = start + ejerciciosPorPagina;
+      const ejerciciosPagina = ejercicios.slice(start, end);
+
+      const container = document.getElementById("ejerciciosContainer");
+      container.innerHTML = "";
+
+      ejerciciosPagina.forEach((ej, i) => {
+        const index = start + i;
+        container.innerHTML += `
+          <div class="ejercicio">
+            ${index + 1}. ¿Cuánto es ${ej.a} × ${ej.b}?
+            <input type="number" name="respuesta${index}" required />
+          </div>
+        `;
       });
 
-      localStorage.setItem("respuestas", JSON.stringify(respuestas));
-
-      if (page === 1) {
-        location.href = "ejercicios.html?page=2";
-      } else {
-        location.href = "resultado.html";
-      }
+      document.getElementById("pagina").textContent = `Página ${paginaActual} de 2`;
     }
+
+    document.getElementById("formEjercicios").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const formData = new FormData(event.target);
+      let respuestasUsuario = JSON.parse(localStorage.getItem("respuestas") || "[]");
+
+      for (let i = 0; i < ejerciciosPorPagina; i++) {
+        const indexGlobal = (paginaActual - 1) * ejerciciosPorPagina + i;
+        const resp = parseInt(formData.get(`respuesta${indexGlobal}`));
+        respuestasUsuario[indexGlobal] = resp;
+      }
+
+      localStorage.setItem("respuestas", JSON.stringify(respuestasUsuario));
+
+      if (paginaActual === 1) {
+        paginaActual = 2;
+        localStorage.setItem("paginaActual", paginaActual);
+        window.location.reload();
+      } else {
+        localStorage.removeItem("paginaActual");
+        window.location.href = "resultado.html";
+      }
+    });
+
+    window.onload = mostrarEjercicios;
   </script>
 </body>
 </html>
