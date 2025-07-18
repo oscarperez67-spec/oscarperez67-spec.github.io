@@ -16,23 +16,36 @@
       font-size: 3em;
       margin-bottom: 0.5em;
     }
+    .ejercicios-grid {
+      display: grid;
+      gap: 1em;
+      justify-content: center;
+      margin-top: 2em;
+    }
     .ejercicio {
-      margin: 1em 0;
-      font-size: 1.8em;
+      font-size: 1.5em;
+      background-color: rgba(255, 255, 255, 0.25);
+      padding: 1em;
+      border-radius: 16px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s;
+    }
+    .ejercicio:hover {
+      transform: scale(1.03);
     }
     input[type="number"] {
-      font-size: 1.5em;
+      font-size: 1.2em;
       padding: 0.3em 0.5em;
       border-radius: 10px;
       border: none;
-      width: 100px;
+      width: 80px;
       text-align: center;
       margin-left: 10px;
     }
     button {
       font-size: 1.5em;
-      margin-top: 1.5em;
-      padding: 0.5em 1em;
+      margin-top: 2em;
+      padding: 0.5em 1.5em;
       border-radius: 12px;
       border: none;
       background-color: #fff;
@@ -52,8 +65,8 @@
 <body>
   <h1>📚 Practica tus Tablas de Multiplicar</h1>
   <form id="formEjercicios">
-    <div id="ejerciciosContainer"></div>
-    <button type="submit">Enviar respuestas</button>
+    <div id="ejerciciosContainer" class="ejercicios-grid"></div>
+    <button type="submit">✅ Enviar respuestas</button>
   </form>
   <div id="pagina"></div>
 
@@ -65,6 +78,7 @@
     const fin = parseInt(localStorage.getItem("fin")) || 3;
     const totalEjercicios = 50;
     const ejerciciosPorPagina = 25;
+    const diseñoColumna = JSON.parse(localStorage.getItem("diseñoColumna")) || { pagina1: 3, pagina2: 2 };
 
     let ejercicios = [];
     let paginaActual = parseInt(localStorage.getItem("paginaActual")) || 1;
@@ -92,18 +106,21 @@
 
       const container = document.getElementById("ejerciciosContainer");
       container.innerHTML = "";
+      const columnas = paginaActual === 1 ? diseñoColumna.pagina1 : diseñoColumna.pagina2;
+      container.style.gridTemplateColumns = `repeat(${columnas}, 1fr)`;
 
       ejerciciosPagina.forEach((ej, i) => {
         const index = start + i;
-        container.innerHTML += `
-          <div class="ejercicio">
-            ${index + 1}. ¿Cuánto es ${ej.a} × ${ej.b}?
-            <input type="number" name="respuesta${index}" required />
-          </div>
+        const div = document.createElement("div");
+        div.className = "ejercicio";
+        div.innerHTML = `
+          <span>🔢 ${index + 1}. ¿Cuánto es <strong>${ej.a} × ${ej.b}</strong>?</span><br/>
+          <input type="number" name="respuesta${index}" required />
         `;
+        container.appendChild(div);
       });
 
-      document.getElementById("pagina").textContent = `Página ${paginaActual} de 2`;
+      document.getElementById("pagina").textContent = `📄 Página ${paginaActual} de 2`;
     }
 
     document.getElementById("formEjercicios").addEventListener("submit", function(event) {

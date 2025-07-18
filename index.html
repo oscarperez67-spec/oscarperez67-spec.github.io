@@ -77,6 +77,10 @@
       localStorage.removeItem("ejercicios");
       localStorage.removeItem("respuestas");
       localStorage.removeItem("paginaActual");
+      localStorage.setItem("diseñoColumna", JSON.stringify({
+        pagina1: 3,
+        pagina2: 2
+      }));
       window.location.href = "ejercicios.html";
     });
   </script>
