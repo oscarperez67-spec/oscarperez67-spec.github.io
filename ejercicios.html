@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>✏️ Resuelve los ejercicios</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>✏️ Resuelve los ejercicios</h1>
+  <div id="contenedorEjercicios" class="card"></div>
+  <button onclick="siguiente()">➡️ Siguiente</button>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const page = parseInt(urlParams.get("page") || "1");
+    const ejercicios = JSON.parse(localStorage.getItem("ejercicios"));
+    const respuestas = JSON.parse(localStorage.getItem("respuestas")) || [];
+
+    const inicio = (page - 1) * 25;
+    const fin = inicio + 25;
+    const subset = ejercicios.slice(inicio, fin);
+
+    const contenedor = document.getElementById("contenedorEjercicios");
+    subset.forEach((ej, i) => {
+      const div = document.createElement("div");
+      div.innerHTML = `
+        ${ej.a} × ${ej.b} = 
+        <input type="number" data-index="${inicio + i}" />
+      `;
+      contenedor.appendChild(div);
+    });
+
+    function siguiente() {
+      const inputs = document.querySelectorAll("input");
+      inputs.forEach(input => {
+        const idx = parseInt(input.dataset.index);
+        respuestas[idx] = parseInt(input.value || "-1");
+      });
+
+      localStorage.setItem("respuestas", JSON.stringify(respuestas));
+
+      if (page === 1) {
+        location.href = "ejercicios.html?page=2";
+      } else {
+        location.href = "resultado.html";
+      }
+    }
+  </script>
+</body>
+</html>

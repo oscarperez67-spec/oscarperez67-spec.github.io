@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>🎉 Resultado Final</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🎉 ¡Resultados!</h1>
+  <div class="card" id="resumen"></div>
+  <audio id="audioCorrecto" src="sonidos/correcto.mp3"></audio>
+  <audio id="audioIncorrecto" src="sonidos/incorrecto.mp3"></audio>
+
+  <script>
+    const ejercicios = JSON.parse(localStorage.getItem("ejercicios"));
+    const respuestas = JSON.parse(localStorage.getItem("respuestas"));
+
+    let correctas = 0, incorrectas = 0;
+    ejercicios.forEach((ej, i) => {
+      const resultado = ej.a * ej.b;
+      if (respuestas[i] === resultado) {
+        correctas++;
+        document.getElementById("audioCorrecto").play();
+      } else {
+        incorrectas++;
+        document.getElementById("audioIncorrecto").play();
+      }
+    });
+
+    document.getElementById("resumen").innerHTML = `
+      ✅ Respuestas correctas: <strong>${correctas}</strong><br>
+      ❌ Respuestas incorrectas: <strong>${incorrectas}</strong><br>
+      <p>¡Buen trabajo! 🥳</p>
+      <button onclick="location.href='index.html'">🔁 Volver a empezar</button>
+    `;
+  </script>
+</body>
+</html>

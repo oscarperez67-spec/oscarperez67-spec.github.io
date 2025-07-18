@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>🧮 Tablas de Multiplicar para Primaria</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🧮 Tablas de Multiplicar para alumnos de Primaria</h1>
+  <div class="card">
+    <p>¿Qué tablas quieres practicar?</p>
+    <label>Desde la tabla:
+      <input type="number" id="tablaInicio" min="1" max="12" value="1">
+    </label>
+    <label>Hasta la tabla:
+      <input type="number" id="tablaFin" min="1" max="12" value="3">
+    </label>
+    <button onclick="iniciar()">🎯 ¡Comenzar!</button>
+  </div>
+
+  <script>
+    function iniciar() {
+      const inicio = parseInt(document.getElementById('tablaInicio').value);
+      const fin = parseInt(document.getElementById('tablaFin').value);
+      if (inicio > fin || inicio < 1 || fin > 12) {
+        alert("Elige un rango válido.");
+        return;
+      }
+
+      const ejercicios = [];
+      for (let i = 0; i < 50; i++) {
+        const a = Math.floor(Math.random() * (fin - inicio + 1)) + inicio;
+        const b = Math.floor(Math.random() * 12) + 1;
+        ejercicios.push({ a, b });
+      }
+
+      localStorage.setItem("ejercicios", JSON.stringify(ejercicios));
+      localStorage.setItem("respuestas", JSON.stringify([]));
+      location.href = "ejercicios.html?page=1";
+    }
+  </script>
+</body>
+</html>
